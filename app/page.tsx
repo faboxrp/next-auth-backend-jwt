@@ -1,23 +1,29 @@
 "use client";
 
-import Button from "@elements/Button";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
+import axios from "axios";
+import Button from "@elements/Button";
 
 const HomePage = () => {
   const { data: session } = useSession();
   const [posts, setPosts] = useState();
-  const fetchPost = async () => {
-    const res = await fetch("http://localhost:8000/test/user/1/posts", {
-      method: "Get",
-      headers: {
-        authorization: `bearer ${session?.user.accessToken}`,
-      },
-    });
 
-    const response = await res.json();
-    setPosts(response);
+  const fetchPost = async () => {
+    try {
+      const res = await axios.get("http://127.0.0.1:8000/api/test/", {
+        headers: {
+          Authorization: `Bearer ${session?.token.access}`,
+        },
+      });
+
+      const response = res.data;
+      setPosts(response);
+    } catch (error) {
+      console.error("Failed to fetch posts:", error);
+    }
   };
+
   return (
     <div>
       <Button onClick={fetchPost}>Get User Posts</Button>
